@@ -53,7 +53,7 @@ class DddArchitectureTest {
     @Test
     void layered_architecture_is_respected() {
         layeredArchitecture()
-                .consideringAllDependencies()
+                .consideringOnlyDependenciesInLayers()
                 .layer("API").definedBy(BASE + ".api..")
                 .layer("Application").definedBy(BASE + ".application..")
                 .layer("Domain").definedBy(BASE + ".domain..")

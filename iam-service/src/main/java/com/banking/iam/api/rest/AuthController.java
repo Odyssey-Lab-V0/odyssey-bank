@@ -3,7 +3,6 @@ package com.banking.iam.api.rest;
 import com.banking.iam.api.dto.LoginRequest;
 import com.banking.iam.api.dto.TokenResponse;
 import com.banking.iam.application.command.AuthApplicationService;
-import com.banking.iam.infrastructure.persistence.repository.CredentialJpaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,27 +17,14 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthApplicationService authService;
-    private final CredentialJpaRepository credentialRepository;
 
-    /**
-     * POST /api/v1/auth/login
-     * Returns access token (15 min) + refresh token (7 days).
-     */
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request,
                                                HttpServletRequest httpRequest) {
         var ip = extractClientIp(httpRequest);
         var fingerprint = httpRequest.getHeader("X-Device-Fingerprint");
 
-        var tokenPair = authService.loginWithCredentialCheck(
-                request.email(),
-                request.password(),
-                fingerprint,
-                ip,
-                userId -> credentialRepository.findByUserIdAndActiveTrue(userId)
-                        .orElseThrow(() -> new com.banking.iam.domain.exception.AuthenticationException("No active credential"))
-                        .getPasswordHash()
-        );
+        var tokenPair = authService.login(request.email(), request.password(), fingerprint, ip);
 
         return ResponseEntity.ok(TokenResponse.of(
                 tokenPair.accessToken(),
