@@ -6,10 +6,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
 
 jobs:
-  # ── Build & push one image per service in parallel ──────────────────────────
   build-images:
     name: Build ${{ matrix.service }}
     runs-on: ubuntu-latest
@@ -31,6 +29,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Lowercase image prefix
+        id: prefix
+        run: echo "value=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -42,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_PREFIX }}/${{ matrix.service }}
+          images: ${{ steps.prefix.outputs.value }}/${{ matrix.service }}
           tags: |
             type=sha,prefix=,format=short
             type=raw,value=latest
@@ -61,8 +63,6 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
-  # ── Update image tags in k8s manifests and commit back ──────────────────────
-  # ArgoCD detects the commit and syncs the cluster automatically.
   update-manifests:
     name: Update K8s image tags
     runs-on: ubuntu-latest
@@ -76,6 +76,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Lowercase image prefix
+        id: prefix
+        run: echo "value=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Compute short SHA
         id: sha
         run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -83,8 +87,9 @@ jobs:
       - name: Update image tags in deployment manifests
         run: |
           SHORT_SHA=${{ steps.sha.outputs.short }}
+          PREFIX=${{ steps.prefix.outputs.value }}
           for svc in iam-service banking-core-service onboarding-service kyc-service aml-service notification-service; do
-            sed -i "s|ghcr.io/${{ github.repository_owner }}/${svc}:.*|ghcr.io/${{ github.repository_owner }}/${svc}:${SHORT_SHA}|g" \
+            sed -i "s|${PREFIX}/${svc}:.*|${PREFIX}/${svc}:${SHORT_SHA}|g" \
               k8s/services/${svc}/deployment.yaml
           done
 
