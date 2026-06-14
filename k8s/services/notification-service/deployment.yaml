@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: ghcr.io/YOUR_ORG/notification-service:latest
+          image: ghcr.io/Odyssey-Lab-V0/notification-service:latest
           ports:
             - containerPort: 8086
           envFrom:
