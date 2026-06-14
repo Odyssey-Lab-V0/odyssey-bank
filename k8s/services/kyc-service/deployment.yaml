@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: kyc-service
-          image: ghcr.io/odyssey-lab-v0/kyc-service:e0302d3
+          image: ghcr.io/odyssey-lab-v0/kyc-service:6f14af3
           ports:
             - containerPort: 8084
           envFrom:
