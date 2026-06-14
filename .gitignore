@@ -1,0 +1,16 @@
+target/
+*.jar
+*.war
+*.class
+.mvn/wrapper/maven-wrapper.properties
+
+.idea/
+*.iml
+*.iws
+.vscode/
+
+*.log
+/tmp/
+
+.env
+*.env.local

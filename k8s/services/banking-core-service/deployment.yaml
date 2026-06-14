@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: banking-core-service
+  namespace: banking
+  labels:
+    app: banking-core-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: banking-core-service
+  template:
+    metadata:
+      labels:
+        app: banking-core-service
+    spec:
+      containers:
+        - name: banking-core-service
+          image: ghcr.io/YOUR_ORG/banking-core-service:latest
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - secretRef:
+                name: banking-db-secret
+            - configMapRef:
+                name: banking-core-service-config
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

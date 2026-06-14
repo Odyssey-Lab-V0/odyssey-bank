@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aml-service
+  namespace: banking
+  labels:
+    app: aml-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aml-service
+  template:
+    metadata:
+      labels:
+        app: aml-service
+    spec:
+      containers:
+        - name: aml-service
+          image: ghcr.io/YOUR_ORG/aml-service:latest
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - secretRef:
+                name: banking-db-secret
+            - configMapRef:
+                name: aml-service-config
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8085
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

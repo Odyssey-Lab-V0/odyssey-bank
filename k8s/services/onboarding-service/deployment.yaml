@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onboarding-service
+  namespace: banking
+  labels:
+    app: onboarding-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onboarding-service
+  template:
+    metadata:
+      labels:
+        app: onboarding-service
+    spec:
+      containers:
+        - name: onboarding-service
+          image: ghcr.io/YOUR_ORG/onboarding-service:latest
+          ports:
+            - containerPort: 8083
+          envFrom:
+            - secretRef:
+                name: banking-db-secret
+            - configMapRef:
+                name: onboarding-service-config
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8083
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8083
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

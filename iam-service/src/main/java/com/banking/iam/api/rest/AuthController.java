@@ -1,0 +1,88 @@
+package com.banking.iam.api.rest;
+
+import com.banking.iam.api.dto.LoginRequest;
+import com.banking.iam.api.dto.TokenResponse;
+import com.banking.iam.application.command.AuthApplicationService;
+import com.banking.iam.infrastructure.persistence.repository.CredentialJpaRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthApplicationService authService;
+    private final CredentialJpaRepository credentialRepository;
+
+    /**
+     * POST /api/v1/auth/login
+     * Returns access token (15 min) + refresh token (7 days).
+     */
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request,
+                                               HttpServletRequest httpRequest) {
+        var ip = extractClientIp(httpRequest);
+        var fingerprint = httpRequest.getHeader("X-Device-Fingerprint");
+
+        var tokenPair = authService.loginWithCredentialCheck(
+                request.email(),
+                request.password(),
+                fingerprint,
+                ip,
+                userId -> credentialRepository.findByUserIdAndActiveTrue(userId)
+                        .orElseThrow(() -> new com.banking.iam.domain.exception.AuthenticationException("No active credential"))
+                        .getPasswordHash()
+        );
+
+        return ResponseEntity.ok(TokenResponse.of(
+                tokenPair.accessToken(),
+                tokenPair.refreshToken(),
+                tokenPair.refreshExpiresAt()
+        ));
+    }
+
+    /**
+     * POST /api/v1/auth/refresh
+     * Rotates the refresh token — old one is invalidated immediately.
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(@RequestBody Map<String, String> body) {
+        var refreshToken = body.get("refreshToken");
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        var tokenPair = authService.refresh(refreshToken);
+        return ResponseEntity.ok(TokenResponse.of(
+                tokenPair.accessToken(),
+                tokenPair.refreshToken(),
+                tokenPair.refreshExpiresAt()
+        ));
+    }
+
+    /**
+     * POST /api/v1/auth/logout
+     * Revokes the session for this device.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody Map<String, String> body) {
+        var refreshToken = body.get("refreshToken");
+        if (refreshToken != null) {
+            authService.logout(refreshToken);
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        var forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
+    }
+}

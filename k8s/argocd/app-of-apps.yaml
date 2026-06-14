@@ -1,0 +1,28 @@
+# Root Application — ArgoCD watches this one Application,
+# which in turn manages all child Applications below.
+# Deploy this manually once: kubectl apply -f k8s/argocd/app-of-apps.yaml -n argocd
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: banking-platform
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_ORG/banking-platform.git
+    targetRevision: main
+    path: k8s/argocd
+    directory:
+      recurse: false
+      exclude: app-of-apps.yaml   # don't self-reference
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
