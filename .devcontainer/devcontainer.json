@@ -1,0 +1,46 @@
+{
+  "name": "Odyssey Bank - K8s Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "latest",
+      "helm": "latest",
+      "minikube": "none"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "jdk": true,
+      "installMaven": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "onCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start-cluster.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "forwardPorts": [8080, 8081, 8082, 8083, 8084, 8085, 8086, 9090, 9091],
+  "portsAttributes": {
+    "8080": {"label": "ArgoCD UI"},
+    "8082": {"label": "banking-core"},
+    "8083": {"label": "onboarding"},
+    "8084": {"label": "kyc"},
+    "8085": {"label": "aml"},
+    "8086": {"label": "notification"}
+  },
+  "remoteUser": "vscode"
+}
