@@ -103,7 +103,7 @@ CREATE TABLE iam.outbox_events (
     aggregate_type   VARCHAR(50)  NOT NULL,
     aggregate_id     UUID         NOT NULL,
     event_type       VARCHAR(100) NOT NULL,
-    payload          JSONB        NOT NULL,
+    payload          TEXT         NOT NULL,
     status           VARCHAR(20)  NOT NULL DEFAULT 'PENDING'
                         CHECK (status IN ('PENDING','PUBLISHED','FAILED')),
     created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
