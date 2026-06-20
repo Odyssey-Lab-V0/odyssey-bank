@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: onboarding-service
-          image: ghcr.io/odyssey-lab-v0/onboarding-service:a41d452
+          image: ghcr.io/odyssey-lab-v0/onboarding-service:64296a6
           ports:
             - containerPort: 8083
           envFrom:
