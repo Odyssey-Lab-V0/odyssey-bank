@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: aml-service
-          image: ghcr.io/odyssey-lab-v0/aml-service:5b1c56e
+          image: ghcr.io/odyssey-lab-v0/aml-service:8725735
           ports:
             - containerPort: 8085
           envFrom:
