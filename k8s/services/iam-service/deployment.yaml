@@ -29,6 +29,8 @@ spec:
                 name: banking-jwt-secret
             - configMapRef:
                 name: iam-service-config
+            - secretRef:
+                name: aiven-kafka-spring-ssl
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness

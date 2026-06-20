@@ -25,6 +25,8 @@ spec:
                 name: banking-db-secret
             - configMapRef:
                 name: notification-service-config
+            - secretRef:
+                name: aiven-kafka-spring-ssl
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
