@@ -23,12 +23,12 @@ data:
             "x": 0,
             "y": 0
           },
-          "title": "Running Pods (banking)",
+          "title": "Running Pods",
           "type": "stat",
           "targets": [
             {
               "expr": "count(kube_pod_status_phase{namespace=\"banking\",phase=\"Running\"})",
-              "legendFormat": ""
+              "legendFormat": "pods"
             }
           ],
           "options": {
@@ -68,12 +68,12 @@ data:
             "x": 4,
             "y": 0
           },
-          "title": "Total Restarts (banking)",
+          "title": "Total Restarts",
           "type": "stat",
           "targets": [
             {
               "expr": "sum(kube_pod_container_status_restarts_total{namespace=\"banking\"})",
-              "legendFormat": ""
+              "legendFormat": "restarts"
             }
           ],
           "options": {
@@ -197,8 +197,8 @@ data:
           "type": "timeseries",
           "targets": [
             {
-              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"banking\",container!=\"\",container!=\"POD\"}[2m])) by (container)",
-              "legendFormat": "{{container}}"
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"banking\",pod!=\"\"}[2m])) by (pod)",
+              "legendFormat": "{{pod}}"
             }
           ],
           "fieldConfig": {
@@ -219,8 +219,8 @@ data:
           "type": "timeseries",
           "targets": [
             {
-              "expr": "sum(container_memory_working_set_bytes{namespace=\"banking\",container!=\"\",container!=\"POD\"}) by (container)",
-              "legendFormat": "{{container}}"
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"banking\",pod!=\"\"}) by (pod)",
+              "legendFormat": "{{pod}}"
             }
           ],
           "fieldConfig": {
@@ -264,7 +264,7 @@ data:
           "targets": [
             {
               "expr": "100 - (rate(node_cpu_seconds_total{mode=\"idle\"}[2m]) * 100)",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{node}}"
             }
           ],
           "fieldConfig": {
@@ -286,7 +286,7 @@ data:
           "targets": [
             {
               "expr": "node_memory_MemAvailable_bytes",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{node}}"
             }
           ],
           "fieldConfig": {
@@ -314,28 +314,6 @@ data:
           "fieldConfig": {
             "defaults": {
               "unit": "reqps"
-            }
-          }
-        },
-        {
-          "id": 11,
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 30
-          },
-          "title": "HTTP p99 Latency (Spring Boot)",
-          "type": "timeseries",
-          "targets": [
-            {
-              "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[2m])) by (le, service, uri))",
-              "legendFormat": "p99 {{service}} {{uri}}"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s"
             }
           }
         }

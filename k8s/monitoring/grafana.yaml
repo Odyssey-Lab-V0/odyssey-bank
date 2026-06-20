@@ -7,10 +7,13 @@ metadata:
 data:
   datasources.yaml: |
     apiVersion: 1
+    deleteDatasources:
+      - name: Prometheus
+      - name: prometheus-1
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://prometheus:9090
+        url: http://prometheus:9090/prometheus
         access: proxy
         isDefault: true
 ---
