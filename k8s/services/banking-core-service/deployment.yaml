@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: banking-core-service
-          image: ghcr.io/odyssey-lab-v0/banking-core-service:cda6931
+          image: ghcr.io/odyssey-lab-v0/banking-core-service:94eb79f
           ports:
             - containerPort: 8082
           envFrom:
