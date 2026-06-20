@@ -82,10 +82,13 @@ management:
       probability: 1.0
 
 # Zipkin
-spring.zipkin:
-  base-url: http://zipkin:9411
 
 logging:
   level:
     com.banking: DEBUG
     org.springframework.security: INFO
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
