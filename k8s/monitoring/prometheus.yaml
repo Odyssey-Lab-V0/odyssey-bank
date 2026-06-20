@@ -157,6 +157,8 @@ spec:
         app: prometheus
     spec:
       serviceAccountName: prometheus
+      nodeSelector:
+        kubernetes.io/hostname: odessey-master-sumo
       containers:
         - name: prometheus
           image: prom/prometheus:v2.51.0
