@@ -105,6 +105,17 @@ data:
           - source_labels: [__meta_kubernetes_pod_name]
             target_label: pod
 
+      - job_name: node-exporter
+        static_configs:
+          - targets:
+            - 129.213.82.14:9100
+            - 193.122.141.217:9100
+            - 132.145.168.173:9100
+
+      - job_name: kube-state-metrics
+        static_configs:
+          - targets: ['kube-state-metrics:8080']
+
       - job_name: banking-services-actuator
         metrics_path: /actuator/prometheus
         kubernetes_sd_configs:

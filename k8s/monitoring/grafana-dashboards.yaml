@@ -14,18 +14,6 @@ data:
         "from": "now-1h",
         "to": "now"
       },
-      "templating": {
-        "list": [
-          {
-            "name": "namespace",
-            "type": "constant",
-            "current": {
-              "value": "banking"
-            },
-            "hide": 2
-          }
-        ]
-      },
       "panels": [
         {
           "id": 1,
@@ -35,11 +23,11 @@ data:
             "x": 0,
             "y": 0
           },
-          "title": "Running Pods",
+          "title": "Running Pods (banking)",
           "type": "stat",
           "targets": [
             {
-              "expr": "count(kube_pod_status_phase{namespace=\"banking\",phase=\"Running\"}) or vector(0)",
+              "expr": "count(kube_pod_status_phase{namespace=\"banking\",phase=\"Running\"})",
               "legendFormat": ""
             }
           ],
@@ -80,7 +68,7 @@ data:
             "x": 4,
             "y": 0
           },
-          "title": "Total Pod Restarts",
+          "title": "Total Restarts (banking)",
           "type": "stat",
           "targets": [
             {
@@ -125,11 +113,11 @@ data:
             "x": 8,
             "y": 0
           },
-          "title": "Cluster CPU Usage %",
+          "title": "Cluster CPU %",
           "type": "gauge",
           "targets": [
             {
-              "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m])))",
+              "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m])) * 100)",
               "legendFormat": "CPU"
             }
           ],
@@ -165,7 +153,7 @@ data:
             "x": 16,
             "y": 0
           },
-          "title": "Cluster Memory Usage %",
+          "title": "Cluster Memory %",
           "type": "gauge",
           "targets": [
             {
@@ -205,12 +193,12 @@ data:
             "x": 0,
             "y": 4
           },
-          "title": "Pod CPU Usage (banking namespace)",
+          "title": "Pod CPU (banking)",
           "type": "timeseries",
           "targets": [
             {
-              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"banking\",container!=\"\",container!=\"POD\"}[2m])) by (pod)",
-              "legendFormat": "{{pod}}"
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"banking\",container!=\"\",container!=\"POD\"}[2m])) by (container)",
+              "legendFormat": "{{container}}"
             }
           ],
           "fieldConfig": {
@@ -227,12 +215,12 @@ data:
             "x": 12,
             "y": 4
           },
-          "title": "Pod Memory Usage (banking namespace)",
+          "title": "Pod Memory (banking)",
           "type": "timeseries",
           "targets": [
             {
-              "expr": "sum(container_memory_working_set_bytes{namespace=\"banking\",container!=\"\",container!=\"POD\"}) by (pod)",
-              "legendFormat": "{{pod}}"
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"banking\",container!=\"\",container!=\"POD\"}) by (container)",
+              "legendFormat": "{{container}}"
             }
           ],
           "fieldConfig": {
@@ -249,7 +237,7 @@ data:
             "x": 0,
             "y": 12
           },
-          "title": "Pod Restarts Over Time (banking)",
+          "title": "Pod Restarts Over Time",
           "type": "timeseries",
           "targets": [
             {
@@ -271,11 +259,11 @@ data:
             "x": 0,
             "y": 18
           },
-          "title": "Node CPU by Node",
+          "title": "Node CPU % by Node",
           "type": "timeseries",
           "targets": [
             {
-              "expr": "100 * (1 - rate(node_cpu_seconds_total{mode=\"idle\"}[2m]))",
+              "expr": "100 - (rate(node_cpu_seconds_total{mode=\"idle\"}[2m]) * 100)",
               "legendFormat": "{{instance}}"
             }
           ],
@@ -315,17 +303,39 @@ data:
             "x": 0,
             "y": 24
           },
-          "title": "HTTP Request Rate (Spring Boot actuator)",
+          "title": "HTTP Request Rate (Spring Boot)",
           "type": "timeseries",
           "targets": [
             {
-              "expr": "sum(rate(http_server_requests_seconds_count{namespace=\"banking\"}[2m])) by (service, uri, status)",
-              "legendFormat": "{{service}} {{uri}} {{status}}"
+              "expr": "sum(rate(http_server_requests_seconds_count[2m])) by (service, uri, status)",
+              "legendFormat": "{{service}} {{uri}} [{{status}}]"
             }
           ],
           "fieldConfig": {
             "defaults": {
               "unit": "reqps"
+            }
+          }
+        },
+        {
+          "id": 11,
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 30
+          },
+          "title": "HTTP p99 Latency (Spring Boot)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[2m])) by (le, service, uri))",
+              "legendFormat": "p99 {{service}} {{uri}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s"
             }
           }
         }
