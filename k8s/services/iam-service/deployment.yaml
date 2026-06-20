@@ -19,7 +19,7 @@ spec:
       containers:
         - name: iam-service
           # CD pipeline updates this tag on every merge to main
-          image: ghcr.io/odyssey-lab-v0/iam-service:91cbac2
+          image: ghcr.io/odyssey-lab-v0/iam-service:6d66f6d
           ports:
             - containerPort: 8081
           envFrom:
