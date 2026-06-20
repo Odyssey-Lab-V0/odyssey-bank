@@ -11,7 +11,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic accountOpenedTopic() {
         return TopicBuilder.name("banking.core.account.opened.v1")
-                .partitions(3)
+                .partitions(1)
                 .replicas(1)
                 .build();
     }
@@ -19,7 +19,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic transactionPostedTopic() {
         return TopicBuilder.name("banking.core.transaction.posted.v1")
-                .partitions(3)
+                .partitions(1)
                 .replicas(1)
                 .build();
     }

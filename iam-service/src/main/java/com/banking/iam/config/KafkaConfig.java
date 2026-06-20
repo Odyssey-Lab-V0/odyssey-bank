@@ -17,7 +17,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic userRegisteredTopic() {
         return TopicBuilder.name("banking.iam.user.registered.v1")
-                .partitions(3)
+                .partitions(1)
                 .replicas(1)
                 .build();
     }
@@ -25,7 +25,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic userStatusChangedTopic() {
         return TopicBuilder.name("banking.iam.user.status-changed.v1")
-                .partitions(3)
+                .partitions(1)
                 .replicas(1)
                 .build();
     }
