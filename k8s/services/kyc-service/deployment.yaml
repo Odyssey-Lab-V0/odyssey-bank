@@ -44,6 +44,10 @@ spec:
               path: /actuator/health/liveness
               port: 8084
             periodSeconds: 15
+          volumeMounts:
+            - name: kafka-ssl
+              mountPath: /etc/kafka-ssl
+              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -51,3 +55,7 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+      volumes:
+        - name: kafka-ssl
+          secret:
+            secretName: aiven-kafka-ssl

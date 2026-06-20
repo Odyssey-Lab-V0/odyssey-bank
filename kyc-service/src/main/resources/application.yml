@@ -31,6 +31,14 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+    security:
+      protocol: \${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+    ssl:
+      key-store-type: \${KAFKA_SSL_KEYSTORE_TYPE:PEM}
+      trust-store-type: \${KAFKA_SSL_TRUSTSTORE_TYPE:PEM}
+      key-store-location: \${KAFKA_SSL_KEY_LOCATION:}
+      certificate-chain-location: \${KAFKA_SSL_CERTIFICATE_LOCATION:}
+      trust-store-location: \${KAFKA_SSL_CA_LOCATION:}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer

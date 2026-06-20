@@ -4,6 +4,12 @@ metadata:
   name: aml-service-config
   namespace: banking
 data:
-  KAFKA_BROKERS: kafka:9092
+  KAFKA_BROKERS: kafka-3239ff2a-odesssey-bank.c.aivencloud.com:23611
   ZIPKIN_URL: http://zipkin:9411
   SPRING_PROFILES_ACTIVE: k8s
+  KAFKA_SECURITY_PROTOCOL: SSL
+  KAFKA_SSL_KEYSTORE_TYPE: PEM
+  KAFKA_SSL_TRUSTSTORE_TYPE: PEM
+  KAFKA_SSL_KEY_LOCATION: /etc/kafka-ssl/access.key
+  KAFKA_SSL_CERTIFICATE_LOCATION: /etc/kafka-ssl/access.cert
+  KAFKA_SSL_CA_LOCATION: /etc/kafka-ssl/ca.cert
